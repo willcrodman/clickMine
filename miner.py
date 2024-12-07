@@ -1,6 +1,7 @@
 import hashlib
 import struct
 import requests
+import base58
  
 class Miner:
     def __init__(self):
@@ -21,6 +22,14 @@ class Miner:
         exponent = bits >> 24
         mantissa = bits & 0xFFFFFF
         return mantissa * (2 ** (8 * (exponent - 3))) 
+    
+    @staticmethod
+    def base58_to_hash160(address):
+        decoded = base58.b58decode(address)
+        payload, checksum = decoded[:-4], decoded[-4:]    
+        hash_twice = hashlib.sha256(hashlib.sha256(payload).digest()).digest()
+        network_byte = payload[0]
+        return payload[1:]
 
     def sha256_data(self, data):
         # Translating SHA-256 hash calculation
@@ -41,6 +50,7 @@ class Miner:
         # Call sha256_data after constructing block header
         self.sha256_data(self.block_header)
 
+    # need to generate the merkle root (and prob other things) rather then getting them from API 
     def fetch_block_data(self):
         # Fetch last block PoW hash data via API
         url = "https://blockchain.info/latestblock" 
@@ -78,6 +88,38 @@ class Miner:
             print(f"Unsolved hash. Nonce: {self.nonce_attempt} | Hash: {self.block_hash_hex}")
             return False 
         
+    def create_coinbase_transaction(self, address): # address must be converted to hash160
+        coinbase_script = b"clickMine.org"  # Arbitrary script for coinbase input
+        coinbase_tx_id = b"\x00" * 32  # Coinbase has no input (null transaction ID)
+        
+        # Create the output script (P2PKH: Pay-to-PubKey-Hash)
+        script_pubkey = b'\x76\xa9' + bytes([len(address)]) + address + b'\x88\xac'
+        value = 50 * 10**8  # 50 BTC in satoshis
+        coinbase_output = struct.pack("<Q", value) + bytes([len(script_pubkey)]) + script_pubkey
+
+        # Assemble coinbase transaction
+        coinbase_tx = (
+            b"\x01"  # Version
+            + b"\x01"  # Input count
+            + coinbase_tx_id  # Null input
+            + b"\xFF\xFF\xFF\xFF"  # Index (coinbase index)
+            + bytes([len(coinbase_script)]) + coinbase_script  # Input script
+            + b"\xFF\xFF\xFF\xFF"  # Sequence
+            + b"\x01"  # Output count
+            + coinbase_output  # Transaction output
+            + b"\x00\x00\x00\x00"  # Locktime
+        )
+        return coinbase_tx
+    
+    def create_block_with_coinbase(self, address):
+        coinbase_tx = self.create_coinbase_transaction(address)
+        self._merkle_root = hashlib.sha256(hashlib.sha256(coinbase_tx).digest()).hexdigest()  # Merkle root with one transaction
+        self.create_block_header(self.nonce_attempt if self.nonce_attempt else 0)
+            
+    def submit_block_to_node(self):
+        # TODO: block_hash_hex will be send to a core bitcoin node via API
+        pass  
+        
     def get_data(self):
         return {
             "block_hash": self._block_hash,
@@ -100,6 +142,7 @@ if __name__ == "__main__":
     miner.create_block_header(NONCE_ATTEMPT)
     
     if miner.hash(): 
+        miner.submit_block_to_node()
         print(f"Solved hash. Nonce: {miner.nonce_attempt} | Hash: {miner.block_hash_hex}")
     else:
         print(f"Unsolved hash. Nonce: {miner.nonce_attempt} | Hash: {miner.block_hash_hex}")
