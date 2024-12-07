@@ -1,7 +1,7 @@
 import hashlib
 import struct
 import requests
-
+ 
 class Miner:
     def __init__(self):
         self._block_hash: str = None
