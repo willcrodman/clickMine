@@ -50,7 +50,7 @@ class Miner:
         # Call sha256_data after constructing block header
         self.sha256_data(self.block_header)
 
-    # need to generate the merkle root (and prob other things) rather then getting them from API 
+    # TODO: generate the merkle root (and prob other things) using Bitcoin Core's getrawmempool RPC, rather then getting them from API 
     def fetch_block_data(self):
         # Fetch last block PoW hash data via API
         url = "https://blockchain.info/latestblock" 
@@ -88,7 +88,8 @@ class Miner:
             print(f"Unsolved hash. Nonce: {self.nonce_attempt} | Hash: {self.block_hash_hex}")
             return False 
         
-    def create_coinbase_transaction(self, address): # address must be converted to hash160
+    def create_coinbase_transaction(self, address):
+        address = self.base58_to_hash160(address) # address must be converted to hash160    
         coinbase_script = b"clickMine.org"  # Arbitrary script for coinbase input
         coinbase_tx_id = b"\x00" * 32  # Coinbase has no input (null transaction ID)
         
@@ -114,10 +115,14 @@ class Miner:
     def create_block_with_coinbase(self, address):
         coinbase_tx = self.create_coinbase_transaction(address)
         self._merkle_root = hashlib.sha256(hashlib.sha256(coinbase_tx).digest()).hexdigest()  # Merkle root with one transaction
-        self.create_block_header(self.nonce_attempt if self.nonce_attempt else 0)
+        
+        if self.nonce_attempt:
+            self.create_block_header(self.nonce_attempt)
+        else:
+            self.create_block_header(0)
             
     def submit_block_to_node(self):
-        # TODO: block_hash_hex will be send to a core bitcoin node via API
+        # TODO: block_hash_hex will be send to a core bitcoin node account via API
         pass  
         
     def get_data(self):
@@ -136,13 +141,13 @@ class Miner:
 
 if __name__ == "__main__":
     NONCE_ATTEMPT = 12345
+    ADDRESS = "1EcFVyggEmZuL3mjmfGQ7wDwryhEGA2Y4u"
     miner = Miner()
     #miner.fetch_block_data() 
     miner.fetch_test_block_data()
     miner.create_block_header(NONCE_ATTEMPT)
     
     if miner.hash(): 
-        miner.submit_block_to_node()
         print(f"Solved hash. Nonce: {miner.nonce_attempt} | Hash: {miner.block_hash_hex}")
     else:
         print(f"Unsolved hash. Nonce: {miner.nonce_attempt} | Hash: {miner.block_hash_hex}")
