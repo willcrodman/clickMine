@@ -15,6 +15,10 @@ get latest block: bitcoin-cli getblock $(bitcoin-cli getbestblockhash)
 ### launch API server
 python3 app.py
 
+### Run virtual environment
+source venv/bin/activate
+
+
 
 ### TODOs
 1. Put the project in a virtual env (to get the Flask API working) 

@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from Flask import Flask, jsonify, request
 from miner import Miner  # Import your Miner class
 from wallet import Wallet
 
