@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>clickMine.org</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .wallet-info, .hash-info {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .wallet-info p, .hash-info p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>clickMine.org</h1>
+
+        <!-- Wallet Information Section -->
+        <div class="section">
+            <h3>Wallet</h3>
+            <div class="wallet-info">
+                <p><strong>Private Key:</strong> <span id="private-key">Loading...</span></p>
+                <p><strong>Public Key:</strong> <span id="public-key">Loading...</span></p>
+                <p><strong>Bitcoin Address:</strong> <span id="bitcoin-address">Loading...</span></p>
+            </div>
+        </div>
+
+        <!-- Attempt Hash Section -->
+        <div class="section">
+            <button id="attempt-hash-btn">Attempt Hash</button>
+        </div>
+
+        <!-- Hash Information Section -->
+        <div class="section">
+            <h3>Hash Attempt Results</h3>
+            <div class="hash-info">
+                <p><strong>Status:</strong> <span id="status">Waiting...</span></p>
+                <p><strong>Hash:</strong> <span id="hash">Waiting...</span></p>
+                <p><strong>Nonce:</strong> <span id="nonce">Waiting...</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to fetch wallet data on page load
+        function fetchWalletData() {
+            $.post('/api/generate_wallet', function(data) {
+                $('#private-key').text(data.private_key);
+                $('#public-key').text(data.public_key);
+                $('#bitcoin-address').text(data.bitcoin_address);
+            });
+        }
+
+        // Function to attempt hashing when the button is clicked
+        $('#attempt-hash-btn').click(function() {
+            $.post('/api/hash', function(data) {
+                $('#status').text(data.status);
+                $('#hash').text(data.hash);
+                $('#nonce').text(data.nonce);
+            });
+        });
+
+        // Fetch wallet data when the page is loaded
+        $(document).ready(function() {
+            fetchWalletData();
+        });
+    </script>
+</body>
+</html>
