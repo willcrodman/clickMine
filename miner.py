@@ -17,7 +17,7 @@ class Miner:
         
         self.nonce_attempt: int = None
         self.block_header: bytes = None
-        self.block_hash_hex: str = None   
+        self.block_hash_hex: str = None
         
     @staticmethod
     def decode_bits(bits):
@@ -69,16 +69,14 @@ class Miner:
         self._bits = block_data['bits']
         self._target = self.decode_bits(self._bits)
         
-    def hash(self, nonce_attempt=None):
-        print(f"Hashing block with difficulty: {self._bits} (target: {self._target})")
-        
+    def hash(self, nonce_attempt=None):        
         if nonce_attempt is None: 
             self.nonce_attempt = random.randint(0, 4294967295)
         else: 
             self.nonce_attempt = nonce_attempt
             
         self.fetch_test_block_data()
-        self.create_block_header(self.nonce_attempt)
+        self.create_block_header()
         hash_as_int = int(self.block_hash_hex, 16)
         
         # Check if the hash meets the minimum target 
@@ -117,7 +115,7 @@ class Miner:
         self._merkle_root = self.sha256_data(coinbase_tx)  
         
         if self.nonce_attempt:
-            self.create_block_header(self.nonce_attempt)
+            self.create_block_header()
         else:
             self.create_block_header(0)
         
@@ -134,7 +132,7 @@ class Miner:
             "block_header": self.block_header.hex() if self.block_header else None,
             "block_hash_hex": self.block_hash_hex
         }
-            
+        
     def set_block_data(self, block_hash, version, previous_hash, merkle_root, timestamp, bits):
         self._block_hash = block_hash
         self._version = version

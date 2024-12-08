@@ -40,6 +40,9 @@
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            word-wrap: break-word;      
+            overflow-wrap: break-word; 
+            white-space: normal;        
         }
 
         .wallet-info p, .hash-info p {
@@ -79,11 +82,6 @@
             </div>
         </div>
 
-        <!-- Attempt Hash Section -->
-        <div class="section">
-            <button id="attempt-hash-btn">Attempt Hash</button>
-        </div>
-
         <!-- Hash Information Section -->
         <div class="section">
             <h3>Hash Attempt Results</h3>
@@ -93,12 +91,17 @@
                 <p><strong>Nonce:</strong> <span id="nonce">Waiting...</span></p>
             </div>
         </div>
+
+        <!-- Attempt Hash Section -->
+        <div class="section">
+            <button id="attempt-hash-btn">Attempt Hash</button>
+        </div>
     </div>
 
     <script>
         // Function to fetch wallet data on page load
         function fetchWalletData() {
-            $.post('/api/generate_wallet', function(data) {
+            $.get('http://127.0.0.1:5000/app/generate_wallet', function(data) {
                 $('#private-key').text(data.private_key);
                 $('#public-key').text(data.public_key);
                 $('#bitcoin-address').text(data.bitcoin_address);
@@ -107,7 +110,7 @@
 
         // Function to attempt hashing when the button is clicked
         $('#attempt-hash-btn').click(function() {
-            $.post('/api/hash', function(data) {
+            $.get('http://127.0.0.1:5000/app/hash', function(data) {
                 $('#status').text(data.status);
                 $('#hash').text(data.hash);
                 $('#nonce').text(data.nonce);
@@ -118,6 +121,7 @@
         $(document).ready(function() {
             fetchWalletData();
         });
+
     </script>
 </body>
 </html>

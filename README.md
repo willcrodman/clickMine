@@ -15,12 +15,14 @@ get latest block: bitcoin-cli getblock $(bitcoin-cli getbestblockhash)
 ### launch API server
 python3 app.py
 
-### Run virtual environment
+### Start and end virtual environment
 source venv/bin/activate
+exit
 
+### Install third party packages
+pip install -r requirements.txt
 
-
-### TODOs
+### 12/7 TODOs 
 1. Put the project in a virtual env (to get the Flask API working) 
 2. create a requirements.txt file to specificity what additional packages are needed in side the evn
 3. run the app server on launch of the website 
