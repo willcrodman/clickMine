@@ -114,7 +114,7 @@ class Miner:
     
     def create_block_with_coinbase(self, address):
         coinbase_tx = self.create_coinbase_transaction(address)
-        self._merkle_root = self.sha256_data(coinbase_tx)  # Merkle root with one transaction
+        self._merkle_root = self.sha256_data(coinbase_tx)  
         
         if self.nonce_attempt:
             self.create_block_header(self.nonce_attempt)
