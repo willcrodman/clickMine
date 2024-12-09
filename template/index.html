@@ -82,6 +82,16 @@
             </div>
         </div>
 
+        <!-- Current Block Being Hashed -->
+        <div class="section">
+            <h3>Next Block Pending</h3>
+            <div class="wallet-info">
+                <p><strong>Merkle Root:</strong> <span id="private-key">Loading...</span></p>
+                <p><strong>Previous Hash:</strong> <span id="public-key">Loading...</span></p>
+                <p><strong>Difficulty:</strong> <span id="bitcoin-address">Loading...</span></p>
+            </div>
+        </div>
+
         <!-- Hash Information Section -->
         <div class="section">
             <h3>Hash Attempt Results</h3>
@@ -107,6 +117,15 @@
                 $('#bitcoin-address').text(data.bitcoin_address);
             });
         }
+
+        // Function to attempt hashing when the button is clicked
+        $('#attempt-hash-btn').click(function() {
+            $.get('http://127.0.0.1:5000/app/hash', function(data) {
+                $('#status').text(data.status);
+                $('#hash').text(data.hash);
+                $('#nonce').text(data.nonce);
+            });
+        });
 
         // Function to attempt hashing when the button is clicked
         $('#attempt-hash-btn').click(function() {

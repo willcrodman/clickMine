@@ -1,10 +1,17 @@
 from flask import Flask, jsonify, request
-from miner import Miner  # Import your Miner class
+
 from wallet import Wallet
+from miner import Miner
 
 app = Flask(__name__)
-miner = Miner()
+
 wallet = Wallet()
+wallet.generate_wallet() 
+address = wallet.get_wallet()['bitcoin_address']
+
+miner = Miner()
+miner.fetch_test_data(25)
+miner.create_block_with_coinbase(address)
 
 # Note to self: GET vs. POST will varry by the direction of info
 @app.route('/app/hash', methods=['GET'])
@@ -16,7 +23,6 @@ def hash_block():
     
 @app.route('/app/generate_wallet', methods=['GET'])
 def generate_wallet():
-    wallet.generate_wallet() 
     return jsonify(wallet.get_wallet())  
 
 if __name__ == '__main__':

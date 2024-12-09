@@ -23,6 +23,4 @@ exit
 pip install -r requirements.txt
 
 ### 12/7 TODOs 
-1. Put the project in a virtual env (to get the Flask API working) 
-2. create a requirements.txt file to specificity what additional packages are needed in side the evn
-3. run the app server on launch of the website 
+1. connect Next Block Pending data via API
