@@ -144,9 +144,9 @@ class Miner:
 if __name__ == "__main__":
     wallet = Wallet()
     wallet.generate_wallet()
-    address = wallet.get_wallet()['bitcoin_address']
+    data = wallet.get_wallet()
     
     miner = Miner()
     miner.test_fetch_data(25)
-    miner.create_block_with_coinbase(address)  # Replace with your address
+    miner.create_block_with_coinbase(data['bitcoin_address'])
     miner.hash()
