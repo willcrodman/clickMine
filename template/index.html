@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>clickMine.org</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -110,7 +109,7 @@
 
     <script>
         function fetch_data() {
-            $.get('http://127.0.0.1:5000/app/generate_wallet')
+            $.get('http://localhost:8080/app/generate_wallet')
                 .done(function(data) {
                     $('#private-key').text(data.private_key);
                     $('#public-key').text(data.public_key);
@@ -121,7 +120,7 @@
                     alert("Error fetching wallet data.");
                 });
 
-            $.get('http://127.0.0.1:5000/app/block_data')
+            $.get('http://localhost:8080/app/block_data')
                 .done(function(data) {
                     $('#merkle-root').text(data.merkle_root);
                     $('#previous-hash').text(data.previous_hash);
@@ -133,7 +132,7 @@
         }
 
         $('#attempt-hash-btn').click(function() {
-            $.get('http://127.0.0.1:5000/app/hash')
+            $.get('http://localhost:8080/app/hash')
                 .done(function(data) {
                     $('#success').text(data.success);
                     $('#block-hash-hex').text(data.block_hash_hex);

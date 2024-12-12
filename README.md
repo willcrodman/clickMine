@@ -22,5 +22,8 @@ exit
 ### Install third party packages
 pip install -r requirements.txt
 
-### 12/7 TODOs 
-1. connect Next Block Pending data via API
+### Build the docker image
+docker build -t clickmine-image .
+
+### Run docker container
+docker run -d -p 8080:5000 clickmine-image
