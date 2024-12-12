@@ -109,7 +109,7 @@
 
     <script>
         function fetch_data() {
-            $.get('http://localhost:8080/app/generate_wallet')
+            $.get('/app/generate_wallet')
                 .done(function(data) {
                     $('#private-key').text(data.private_key);
                     $('#public-key').text(data.public_key);
@@ -120,7 +120,7 @@
                     alert("Error fetching wallet data.");
                 });
 
-            $.get('http://localhost:8080/app/block_data')
+            $.get('/app/block_data')
                 .done(function(data) {
                     $('#merkle-root').text(data.merkle_root);
                     $('#previous-hash').text(data.previous_hash);
@@ -132,7 +132,7 @@
         }
 
         $('#attempt-hash-btn').click(function() {
-            $.get('http://localhost:8080/app/hash')
+            $.get('/app/hash')
                 .done(function(data) {
                     $('#success').text(data.success);
                     $('#block-hash-hex').text(data.block_hash_hex);
