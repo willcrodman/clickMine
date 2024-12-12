@@ -2,7 +2,7 @@ import os
 import hashlib
 import base58
 from ecdsa import SigningKey, SECP256k1
-
+import json
 class Wallet:
     def __init__(self):
         self.private_key_hex = None
@@ -42,13 +42,8 @@ class Wallet:
         # Convert public key to hex format for convenience
         self.public_key_hex = public_key.hex()
 
-    def set_wallet(self, private_key_hex, public_key_hex, bitcoin_address):
-        self.private_key_hex = private_key_hex
-        self.public_key_hex = public_key_hex
-        self.bitcoin_address = bitcoin_address
-
-    def get_wallet(self):
-        return {
+    def get_dict(self):
+        return  {
             "private_key": self.private_key_hex,
             "public_key": self.public_key_hex,
             "bitcoin_address": self.bitcoin_address

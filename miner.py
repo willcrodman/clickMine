@@ -20,6 +20,7 @@ class Miner:
         self.nonce_attempt: int = None
         self.block_header: bytes = None
         self.block_hash_hex: str = None
+        self.success: bool = None 
         
     @staticmethod
     def decode_bits(bits):
@@ -38,7 +39,7 @@ class Miner:
         return hashlib.sha256(hashlib.sha256(data).digest()).digest()
 
 
-    def fetch_test_data(self, n_transactions=None):
+    def test_fetch_data(self, n_transactions=None):
         # Fetch the latest block metadata via API
         latest_block_url = "https://blockchain.info/latestblock"
         latest_block_data = requests.get(latest_block_url).json()
@@ -115,17 +116,37 @@ class Miner:
         
         if hash_as_int < self._target:
             print(f"Solved hash! Nonce: {self.nonce_attempt} | Hash: {self.block_hash_hex}")
-            return True
+            self.success = True
+            self.test_broadcast_block()
         else:
             print(f"Unsolved hash. Nonce: {self.nonce_attempt} | Hash: {self.block_hash_hex}")
-            return False
-
+            self.success = False
+            
+    def test_broadcast_block(): 
+        pass
+        
+    def get_dict(self):
+        return {
+            "block_hash": self._block_hash,
+            "version": self._version,
+            "previous_hash": self._previous_hash,
+            "merkle_root": self._merkle_root,
+            "timestamp": self._timestamp,
+            "bits": self._bits,
+            "target": self._target,
+            "transactions": self._transactions,
+            "nonce_attempt": self.nonce_attempt,
+            "block_header": self.block_header.hex() if self.block_header else None,
+            "block_hash_hex": self.block_hash_hex,
+            "success": "Success" if self.success else "Unsuccess"
+        }
+        
 if __name__ == "__main__":
     wallet = Wallet()
     wallet.generate_wallet()
     address = wallet.get_wallet()['bitcoin_address']
     
     miner = Miner()
-    miner.fetch_test_data(25)
+    miner.test_fetch_data(25)
     miner.create_block_with_coinbase(address)  # Replace with your address
     miner.hash()

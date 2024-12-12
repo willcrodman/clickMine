@@ -86,9 +86,9 @@
         <div class="section">
             <h3>Next Block Pending</h3>
             <div class="wallet-info">
-                <p><strong>Merkle Root:</strong> <span id="private-key">Loading...</span></p>
-                <p><strong>Previous Hash:</strong> <span id="public-key">Loading...</span></p>
-                <p><strong>Difficulty:</strong> <span id="bitcoin-address">Loading...</span></p>
+                <p><strong>Merkle Root:</strong> <span id="merkle-root">Loading...</span></p>
+                <p><strong>Previous Hash:</strong> <span id="previous-hash">Loading...</span></p>
+                <p><strong>Hash Difficulty:</strong> <span id="target">Loading...</span></p>
             </div>
         </div>
 
@@ -96,9 +96,9 @@
         <div class="section">
             <h3>Hash Attempt Results</h3>
             <div class="hash-info">
-                <p><strong>Status:</strong> <span id="status">Waiting...</span></p>
-                <p><strong>Hash:</strong> <span id="hash">Waiting...</span></p>
-                <p><strong>Nonce:</strong> <span id="nonce">Waiting...</span></p>
+                <p><strong>Status:</strong> <span id="success">Waiting...</span></p>
+                <p><strong>Hash:</strong> <span id="block-hash-hex">Waiting...</span></p>
+                <p><strong>Nonce:</strong> <span id="nonce-attempt">Waiting...</span></p>
             </div>
         </div>
 
@@ -109,38 +109,46 @@
     </div>
 
     <script>
-        // Function to fetch wallet data on page load
-        function fetchWalletData() {
-            $.get('http://127.0.0.1:5000/app/generate_wallet', function(data) {
-                $('#private-key').text(data.private_key);
-                $('#public-key').text(data.public_key);
-                $('#bitcoin-address').text(data.bitcoin_address);
-            });
+        function fetch_data() {
+            $.get('http://127.0.0.1:5000/app/generate_wallet')
+                .done(function(data) {
+                    $('#private-key').text(data.private_key);
+                    $('#public-key').text(data.public_key);
+                    $('#bitcoin-address').text(data.bitcoin_address);
+                })
+                .fail(function(xhr, status, error) {
+                    console.error("Failed to fetch wallet data:", status, error);
+                    alert("Error fetching wallet data.");
+                });
+
+            $.get('http://127.0.0.1:5000/app/block_data')
+                .done(function(data) {
+                    $('#merkle-root').text(data.merkle_root);
+                    $('#previous-hash').text(data.previous_hash);
+                    $('#target').text(data.target);
+                })
+                .fail(function(xhr, status, error) {
+                    console.error("Failed to fetch miner data:", status, error);
+                });
         }
 
-        // Function to attempt hashing when the button is clicked
         $('#attempt-hash-btn').click(function() {
-            $.get('http://127.0.0.1:5000/app/hash', function(data) {
-                $('#status').text(data.status);
-                $('#hash').text(data.hash);
-                $('#nonce').text(data.nonce);
-            });
-        });
+            $.get('http://127.0.0.1:5000/app/hash')
+                .done(function(data) {
+                    $('#success').text(data.success);
+                    $('#block-hash-hex').text(data.block_hash_hex);
+                    $('#nonce-attempt').text(data.nonce_attempt);
+                })
+                .fail(function(xhr, status, error) {
+                    console.error("Failed to attempt hash:", status, error);
+                    alert("Error attempting hash.");
+                });
 
-        // Function to attempt hashing when the button is clicked
-        $('#attempt-hash-btn').click(function() {
-            $.get('http://127.0.0.1:5000/app/hash', function(data) {
-                $('#status').text(data.status);
-                $('#hash').text(data.hash);
-                $('#nonce').text(data.nonce);
             });
-        });
-
-        // Fetch wallet data when the page is loaded
+                
         $(document).ready(function() {
-            fetchWalletData();
+            fetch_data();
         });
-
     </script>
 </body>
 </html>
