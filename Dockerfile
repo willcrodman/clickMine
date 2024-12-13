@@ -10,7 +10,7 @@ COPY requirements.txt .
 # Install the dependencies from requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy all the contents from the current directory into the container
+# Copy all the contents from the currteent directory into the container
 COPY . .
 
 # Expose port 8080 (adjust as needed)
