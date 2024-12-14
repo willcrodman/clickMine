@@ -26,4 +26,4 @@ pip install -r requirements.txt
 docker build -t clickmine-image .
 
 ### Run docker container
-docker run -d -p 8080:5000 clickmine-image 
+docker run -d --name clickmine-container -p 8080:8080 clickmine-image

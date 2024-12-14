@@ -1,9 +1,11 @@
 from flask import Flask, jsonify, request, send_from_directory
+from flask_cors import CORS
 
 from wallet import Wallet
 from miner import Miner
 
 app = Flask(__name__, static_folder='static')
+CORS(app)
 
 wallet = Wallet()
 wallet.generate_wallet() 
