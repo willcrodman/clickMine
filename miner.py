@@ -39,7 +39,7 @@ class Miner:
         return hashlib.sha256(hashlib.sha256(data).digest()).digest()
 
 
-    def test_fetch_data(self, n_transactions=None):
+    def test_fetch_data(self, n_transactions=25):
         # Fetch the latest block metadata via API
         latest_block_url = "https://blockchain.info/latestblock"
         latest_block_data = requests.get(latest_block_url).json()
