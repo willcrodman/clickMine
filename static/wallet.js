@@ -135,6 +135,7 @@ function ripemd160(message) {
     const blocks = pad(new TextEncoder().encode(message));
     for (let i = 0; i < blocks.length; i += 16) {
         const w = blocks.subarray(i, i + 16);
+
         let al, bl, cl, dl, el;
         let ar, br, cr, dr, er;
         al = ar = h[0];
@@ -145,33 +146,41 @@ function ripemd160(message) {
 
         for (let j = 0; j < 80; j++) {
             const round = j >> 4;
-            const tl = rol(al + f[round](bl, cl, dl) + w[r[0][j]] + K[0][round], s[0][j]) + el;
+            if (r[0][j] >= w.length || r[1][j] >= w.length) {
+                throw new Error(`Invalid index at round ${j}: ${r[0][j]} or ${r[1][j]}`);
+            }
+            const tl = rol((al + f[round](bl, cl, dl) + w[r[0][j]] + K[0][round]) >>> 0, s[0][j]) + el;
+            const tr = rol((ar + f[4 - round](br, cr, dr) + w[r[1][j]] + K[1][round]) >>> 0, s[1][j]) + er;
             al = el;
             el = dl;
             dl = rol(cl, 10);
             cl = bl;
-            bl = tl;
+            bl = tl >>> 0;
 
-            const tr = rol(ar + f[4 - round](br, cr, dr) + w[r[1][j]] + K[1][round], s[1][j]) + er;
             ar = er;
             er = dr;
             dr = rol(cr, 10);
             cr = br;
-            br = tr;
+            br = tr >>> 0;
+
+            console.log(`Round ${j}: tl=${tl}, tr=${tr}, h=${h}`);
         }
 
-        const t = (h[1] + cl + dr) | 0;
-        h[1] = (h[2] + dl + er) | 0;
-        h[2] = (h[3] + el + ar) | 0;
-        h[3] = (h[4] + al + br) | 0;
-        h[4] = (h[0] + bl + cr) | 0;
+        const t = (h[1] + cl + dr) >>> 0;
+        h[1] = (h[2] + dl + er) >>> 0;
+        h[2] = (h[3] + el + ar) >>> 0;
+        h[3] = (h[4] + al + br) >>> 0;
+        h[4] = (h[0] + bl + cr) >>> 0;
         h[0] = t;
+
+        console.log("Updated hash state:", h);
     }
 
-    return h.map((x) => x.toString(16).padStart(8, "0")).join("");
+    console.log("Final hash state before encoding:", h);
+    // Updated line to handle unsigned 32-bit integers
+    return h.map((x) => (x >>> 0).toString(16).padStart(8, "0")).join("");
 }
 
-// Base58 encoding implementation
 function base58Encode(hex) {
     const alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
     const base = BigInt(58);
@@ -195,9 +204,15 @@ function base58Encode(hex) {
 // Wallet class
 class Wallet {
     constructor() {
+        this.privateKey = null; // Initialize as null
+        this.publicKey = null;  // Initialize as null
+        this.bitcoinAddress = null; // Initialize as null
+    }
+
+    async initialize() {
         this.privateKey = this.generatePrivateKey();
         this.publicKey = this.generatePublicKey(this.privateKey);
-        this.bitcoinAddress = this.generateBitcoinAddress(this.publicKey);
+        this.bitcoinAddress = await this.generateBitcoinAddress(this.publicKey);
     }
 
     generatePrivateKey() {
@@ -213,22 +228,37 @@ class Wallet {
 
     async generateBitcoinAddress(publicKey) {
         const sha256Hash = await sha256(publicKey);
+
         const ripemd160Hash = ripemd160(sha256Hash);
 
         const versionedPayload = '00' + ripemd160Hash;
+
         const doubleSHA = await sha256(await sha256(versionedPayload));
         const checksum = doubleSHA.substring(0, 8);
 
         const fullPayload = versionedPayload + checksum;
-        return base58Encode(fullPayload);
+
+        const bitcoinAddress = base58Encode(fullPayload);
+
+        return bitcoinAddress;
     }
 }
 
-// Example usage
+// Asynchronous DOM Update
 document.addEventListener('DOMContentLoaded', async () => {
-const wallet = new Wallet();
+    const wallet = new Wallet();
 
-document.getElementById('private-key').textContent = wallet.privateKey;
-document.getElementById('public-key').textContent = wallet.publicKey;
-document.getElementById('bitcoin-address').textContent = wallet.bitcoinAddress;
+    // Show placeholders while the wallet initializes
+    document.getElementById('private-key').textContent = "Loading private key...";
+    document.getElementById('public-key').textContent = "Loading public key...";
+    document.getElementById('bitcoin-address').textContent = "Generating address...";
+
+    // Initialize the wallet (asynchronous)
+    await wallet.initialize();
+
+    // Update the DOM with actual values
+    document.getElementById('private-key').textContent = wallet.privateKey;
+    document.getElementById('public-key').textContent = wallet.publicKey;
+    document.getElementById('bitcoin-address').textContent = wallet.bitcoinAddress;
 });
+
