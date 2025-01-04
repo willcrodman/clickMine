@@ -61,12 +61,6 @@ def hash_block():
     miner = session_miners[session_id]
     miner.hash()
     return jsonify(miner.get_dict())
-    
-@app.route('/app/generate_wallet', methods=['GET'])
-def generate_wallet():
-    session_id = session['session_id']
-    wallet = session_wallets[session_id]
-    return jsonify(wallet.get_dict())
 
 @app.route('/app/block_data', methods=['GET'])
 def block_data():
@@ -80,4 +74,4 @@ def serve_index(path):
     return send_from_directory(app.static_folder, 'index.html')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80)
+    app.run(debug=True, host='0.0.0.0', port=80)

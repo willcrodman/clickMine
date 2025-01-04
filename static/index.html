@@ -108,20 +108,10 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="/static/wallet.js" type="module"></script>
 
     <script>
         function fetch_data() {
-            $.get('/app/generate_wallet')
-                .done(function(data) {
-                    $('#private-key').text(data.private_key);
-                    $('#public-key').text(data.public_key);
-                    $('#bitcoin-address').text(data.bitcoin_address);
-                })
-                .fail(function(xhr, status, error) {
-                    console.error("Failed to fetch wallet data:", status, error);
-                    alert("Error fetching wallet data.");
-                });
-
             $.get('/app/block_data')
                 .done(function(data) {
                     $('#merkle-root').text(data.merkle_root);
