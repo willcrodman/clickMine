@@ -62,6 +62,12 @@ def hash_block():
     miner.hash()
     return jsonify(miner.get_dict())
 
+@app.route('/app/generate_wallet', methods=['GET'])
+def generate_wallet():
+    session_id = session['session_id']
+    wallet = session_wallets[session_id]
+    return jsonify(wallet.get_dict())
+
 @app.route('/app/block_data', methods=['GET'])
 def block_data():
     session_id = session['session_id']

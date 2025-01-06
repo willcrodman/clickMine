@@ -16,7 +16,7 @@ class Miner:
         self._bits: int = None
         self._target: int = None
         self._transactions: list = None
-           
+
         self.nonce_attempt: int = None
         self.block_header: bytes = None
         self.block_hash_hex: str = None
@@ -37,7 +37,6 @@ class Miner:
     @staticmethod
     def nested_sha256(data):
         return hashlib.sha256(hashlib.sha256(data).digest()).digest()
-
 
     def test_fetch_data(self, n_transactions=25):
         # Fetch the latest block metadata via API
@@ -67,7 +66,7 @@ class Miner:
                 hashes.append(hashes[-1])
             hashes = [self.nested_sha256(hashes[i] + hashes[i + 1]) for i in range(0, len(hashes), 2)]
         return hashes[0].hex()
-
+    
     def create_coinbase_transaction(self, address):
         address_hash = self.base58_to_hash160(address)
         coinbase_script = b"clickMine.org"
